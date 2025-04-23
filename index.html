@@ -2,17 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Simple Avatar Builder</title>
+  <title>Worm Builder V1.0</title>
   <style>
     body { font-family: sans-serif; text-align: center; }
-    #avatar { position: relative; width: 200px; height: 200px; margin: auto; }
+    #Worm { position: relative; width: 200px; height: 200px; margin: auto; }
     .layer { position: absolute; top: 0; left: 0; width: 200px; height: 200px; }
     canvas { display: none; }
   </style>
 </head>
 <body>
-  <h1>Avatar Builder</h1>
-  <div id="avatar">
+  <h1>Worm Builder</h1>
+  <div id="Worm">
     <img id="body" class="layer" src="images/body/body1.png">
     <img id="eyes" class="layer" src="images/eyes/eyes1.png">
     <img id="hair" class="layer" src="images/hair/hair1.png">
@@ -20,7 +20,7 @@
   <br>
   <button onclick="setPart('hair', 'hair2.png')">Change Hair</button>
   <button onclick="setPart('eyes', 'eyes2.png')">Change Eyes</button>
-  <button onclick="downloadAvatar()">Download Avatar</button>
+  <button onclick="downloadAvatar()">Download Worm</button>
 
   <canvas id="avatarCanvas" width="200" height="200"></canvas>
 
