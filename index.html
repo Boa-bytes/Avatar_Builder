@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Avatar Builder</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; }
+    #avatar { position: relative; width: 200px; height: 200px; margin: auto; }
+    .layer { position: absolute; top: 0; left: 0; width: 200px; height: 200px; }
+    canvas { display: none; }
+  </style>
+</head>
+<body>
+  <h1>Avatar Builder</h1>
+  <div id="avatar">
+    <img id="body" class="layer" src="images/body/body1.png">
+    <img id="eyes" class="layer" src="images/eyes/eyes1.png">
+    <img id="hair" class="layer" src="images/hair/hair1.png">
+  </div>
+  <br>
+  <button onclick="setPart('hair', 'hair2.png')">Change Hair</button>
+  <button onclick="setPart('eyes', 'eyes2.png')">Change Eyes</button>
+  <button onclick="downloadAvatar()">Download Avatar</button>
+
+  <canvas id="avatarCanvas" width="200" height="200"></canvas>
+
+  <script>
+    function setPart(part, filename) {
+      document.getElementById(part).src = `images/${part}/${filename}`;
+    }
+
+    function downloadAvatar() {
+      const canvas = document.getElementById('avatarCanvas');
+      const ctx = canvas.getContext('2d');
+      const layers = ['body', 'eyes', 'hair'];
+      ctx.clearRect(0, 0, 200, 200);
+      let loaded = 0;
+
+      layers.forEach(id => {
+        const img = document.getElementById(id);
+        const temp = new Image();
+        temp.crossOrigin = "Anonymous";
+        temp.src = img.src;
+        temp.onload = () => {
+          ctx.drawImage(temp, 0, 0, 200, 200);
+          loaded++;
+          if (loaded === layers.length) {
+            const link = document.createElement('a');
+            link.download = 'avatar.png';
+            link.href = canvas.toDataURL();
+            link.click();
+          }
+        };
+      });
+    }
+  </script>
+</body>
+</html>
