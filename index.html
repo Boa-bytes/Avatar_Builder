@@ -1,59 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Worm Builder V1.0</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Worm Customizer</title>
   <style>
-    body { font-family: sans-serif; text-align: center; }
-    #Worm { position: relative; width: 200px; height: 200px; margin: auto; }
-    .layer { position: absolute; top: 0; left: 0; width: 200px; height: 200px; }
-    canvas { display: none; }
+    body {
+      font-family: sans-serif;
+      display: flex;
+      padding: 20px;
+    }
+    #wormCanvas {
+      border: 1px solid #ccc;
+      width: 400px;
+      height: 400px;
+      position: relative;
+      background-color: #f3f3f3;
+    }
+    .controls {
+      margin-left: 20px;
+    }
+    .tabs button {
+      display: block;
+      margin-bottom: 5px;
+      padding: 8px;
+      width: 100px;
+    }
+    .options img {
+      width: 60px;
+      height: 60px;
+      margin: 5px;
+      cursor: pointer;
+      border: 2px solid transparent;
+    }
+    .options img:hover {
+      border-color: blue;
+    }
   </style>
 </head>
 <body>
-  <h1>Worm Builder V1.0</h1>
-  <p>Work in progress, use with caution, may explode :P<p>
-  <div id="Worm">
-    <img id="body" class="layer" src="images/body/body1.png">
-    <img id="eyes" class="layer" src="images/eyes/eyes1.png">
-    <img id="hair" class="layer" src="images/hair/hair1.png">
+  <div>
+    <div id="wormCanvas"></div>
+    <button onclick="changeTexture()">Change Texture</button>
+    <button onclick="downloadWorm()">Download Worm</button>
   </div>
-  <br>
-  <button onclick="setPart('hair', 'hair2.png')">Change Hair</button>
-  <button onclick="setPart('eyes', 'eyes2.png')">Change Eyes</button>
-  <button onclick="downloadAvatar()">Download Worm</button>
-
-  <canvas id="avatarCanvas" width="200" height="200"></canvas>
+  <div class="controls">
+    <div class="tabs">
+      <button onclick="selectCategory('hat')">Hat</button>
+      <button onclick="selectCategory('extra')">Extra</button>
+      <button onclick="selectCategory('face')">Face</button>
+      <button onclick="selectCategory('tex')">Texture</button>
+    </div>
+    <div class="options" id="optionsPanel"></div>
+  </div>
 
   <script>
-    function setPart(part, filename) {
-      document.getElementById(part).src = `images/${part}/${filename}`;
-    }
+    const wormCanvas = document.getElementById("wormCanvas");
+    const optionsPanel = document.getElementById("optionsPanel");
 
-    function downloadAvatar() {
-      const canvas = document.getElementById('avatarCanvas');
-      const ctx = canvas.getContext('2d');
-      const layers = ['body', 'eyes', 'hair'];
-      ctx.clearRect(0, 0, 200, 200);
-      let loaded = 0;
+    const categories = {
+      hat: ["hat1.png", "hat2.png"],
+      extra: ["scarf.png", "glasses.png"],
+      face: ["smile.png", "angry.png"],
+      tex: ["tex1.png", "tex2.png"]
+    };
 
-      layers.forEach(id => {
-        const img = document.getElementById(id);
-        const temp = new Image();
-        temp.crossOrigin = "Anonymous";
-        temp.src = img.src;
-        temp.onload = () => {
-          ctx.drawImage(temp, 0, 0, 200, 200);
-          loaded++;
-          if (loaded === layers.length) {
-            const link = document.createElement('a');
-            link.download = 'avatar.png';
-            link.href = canvas.toDataURL();
-            link.click();
-          }
-        };
+    let wormParts = {
+      base: "base.png",
+      hat: null,
+      extra: null,
+      face: null,
+      tex: "tex1.png"
+    };
+
+    function drawWorm() {
+      wormCanvas.innerHTML = "";
+      ["tex", "base", "face", "extra", "hat"].forEach(part => {
+        if (wormParts[part]) {
+          const img = document.createElement("img");
+          img.src = `assets/${wormParts[part]}`;
+          img.style.position = "absolute";
+          img.style.top = 0;
+          img.style.left = 0;
+          img.style.width = "100%";
+          img.style.height = "100%";
+          wormCanvas.appendChild(img);
+        }
       });
     }
+
+    function selectCategory(category) {
+      optionsPanel.innerHTML = "";
+      categories[category].forEach(file => {
+        const img = document.createElement("img");
+        img.src = `assets/${file}`;
+        img.onclick = () => {
+          wormParts[category] = file;
+          drawWorm();
+        };
+        optionsPanel.appendChild(img);
+      });
+    }
+
+    function changeTexture() {
+      const texList = categories.tex;
+      const current = wormParts.tex;
+      const idx = texList.indexOf(current);
+      wormParts.tex = texList[(idx + 1) % texList.length];
+      drawWorm();
+    }
+
+    function downloadWorm() {
+      const canvas = document.createElement("canvas");
+      canvas.width = 400;
+      canvas.height = 400;
+      const ctx = canvas.getContext("2d");
+
+      const partsToDraw = ["tex", "base", "face", "extra", "hat"];
+      let loaded = 0;
+      const imgs = [];
+
+      partsToDraw.forEach((part, i) => {
+        if (wormParts[part]) {
+          const img = new Image();
+          img.src = `assets/${wormParts[part]}`;
+          img.onload = () => {
+            imgs[i] = img;
+            loaded++;
+            if (loaded === partsToDraw.filter(p => wormParts[p]).length) {
+              imgs.forEach(img => ctx.drawImage(img, 0, 0, 400, 400));
+              const link = document.createElement("a");
+              link.download = "custom_worm.png";
+              link.href = canvas.toDataURL();
+              link.click();
+            }
+          };
+        }
+      });
+    }
+
+    drawWorm();
+    selectCategory("hat");
   </script>
 </body>
 </html>
